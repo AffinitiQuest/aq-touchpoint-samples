@@ -25,7 +25,10 @@ npm run dev
 
 ## Open static page
 
-[https://localhost:3001](https://localhost:3001)
+[http://localhost:3001](http://localhost:3001)
+
+## Configure your environment
+<todo>
 
 ## Customizing
 [Modify Authentication Credentials](src/app/controllers/auth.controller.ts)
