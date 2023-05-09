@@ -25,7 +25,7 @@ cd <your path to>/aq-touchpoint-samples
 ```bash
 vi .env
 ```
-3. Modified the configuration values with the specific for your tenant.
+3. Modify the configuration values with the specifics for your tenant.
 
 ## Run Server
 
