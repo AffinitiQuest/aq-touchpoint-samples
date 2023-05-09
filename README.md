@@ -16,14 +16,7 @@ npm install
 npm install -g @foal/cli 
 ```
 
-## Run Server
-
-```sh
-#run the development server
-npm run dev 
-```
-
-## Configure your environment
+## Configuration
 1. change directory into the aq-touchpoint-samples directory
 ```bash
 cd <your path to>/aq-touchpoint-samples
@@ -34,11 +27,16 @@ vi .env
 ```
 3. Modified the configuration values with the specific for your tenant.
 
+## Run Server
+
+```sh
+#run the development server
+npm run dev 
+```
+
 ## Open static page
 
 [http://localhost:3001](http://localhost:3001)
-
-
 
 ## Customizing
 [Modify Authentication Credentials](src/app/controllers/auth.controller.ts)
@@ -48,7 +46,7 @@ vi .env
 [Modify config which specifies auth, touchpoint and credential settings](config/default.json)
 
 
-## Integration with AffinitiQuest
+## Integrating your Application using AffinitiQuest Touchpoints
 
 AffinitiQuest introduces an abstraction called a "TouchPoint" (TP). TouchPoints are comprised of multiple parts:
 - a database entity. 
