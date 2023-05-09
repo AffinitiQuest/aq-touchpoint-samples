@@ -23,12 +23,22 @@ npm install -g @foal/cli
 npm run dev 
 ```
 
+## Configure your environment
+1. change directory into the aq-touchpoint-samples directory
+```bash
+cd <your path to>/aq-touchpoint-samples
+```
+2. Edit the (hidden) file called .env
+```bash
+vi .env
+```
+3. Modified the configuration values with the specific for your tenant.
+
 ## Open static page
 
 [http://localhost:3001](http://localhost:3001)
 
-## Configure your environment
-<todo>
+
 
 ## Customizing
 [Modify Authentication Credentials](src/app/controllers/auth.controller.ts)
