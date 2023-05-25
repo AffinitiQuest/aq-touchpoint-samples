@@ -1,11 +1,15 @@
-import { Env, Context, controller, IAppController, Get, HttpResponseOK, dependency, render, renderToString, Config, HttpResponseBadRequest, HttpResponseConflict } from '@foal/core';
+import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict } from '@foal/core';
 
-import { ApiController, AbstractDemoController } from './controllers';
+import { ApiController } from './controllers';
 import { Auth } from './services';
 import axios from 'axios';
 import { dirname } from 'path';
 
-export class AppController extends AbstractDemoController {
+@Hook(() => response => {
+  // Every response of this controller and its sub-controllers will be added this header.
+  response.setHeader('Access-Control-Allow-Origin', '*');
+})
+export class AppController {
   @dependency
   authService: Auth;
 
@@ -17,11 +21,11 @@ export class AppController extends AbstractDemoController {
   private static operationVerify = "verify";
 
   private async handleAqTouchpoint(ctx: Context, operation: string ) {
-     return await this.renderTemplate('aq-touchpoint.html', {
+     return await render('templates/aq-touchpoint.html', {
       api: Config.get("demoTouchpoints.api"),
       touchpointId: Config.get(`demoTouchpoints.${operation}`),
       title: `${operation} - &lt;aq-touchpoint/&gt;`
-    });
+    }, __dirname);
   }
 
   @Get('/aq-touchpoint-issue')
@@ -55,14 +59,14 @@ export class AppController extends AbstractDemoController {
       console.log( data );
 
       // use the data returned from the API call to render the template html
-      return await this.renderTemplate('open-touchpoint.html', {
+      return await render('templates/open-touchpoint.html', {
         touchpointId: touchpointId,
         title: `${operation} - Open Touchpoint`,
         brandLogo: data.brand.logo,
         touchpointTitle: data.touchpoint.title,
         qrcode: data.action.qrcode,
         wallet: "Microsoft Authenticator"
-      });
+      }, __dirname);
     }
     catch( e ) {
       console.log( `handleOpenTouchpoint Failed`);
@@ -82,9 +86,10 @@ export class AppController extends AbstractDemoController {
 
   @Get('/minimal-demo')
   async minimalDemo(ctx: Context) {
-    return await this.renderTemplate('minimal-demo.html', {
-      api: Config.get("demoTouchpoints.api")
-    });
+    return await render('templates/minimal-demo.html', {
+      api: Config.get("demoTouchpoints.api"),
+      touchpointId: Config.get(`demoTouchpoints.verify`),
+    }, __dirname);
   }
 
 }
