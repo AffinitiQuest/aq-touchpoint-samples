@@ -20,6 +20,24 @@ export class AppController {
   private static operationIssue = "issue";
   private static operationVerify = "verify";
 
+  @Get('/')
+  private async index(ctx: Context) {
+    const authConfig = Config.get("auth");
+    let configured = true;
+    for( const key in authConfig ) {
+      const value = Config.get(`auth.${key}`);
+      if( value == undefined || value.includes('<') || value.includes('>') || value.toLowerCase().includes('azure') ) {
+        console.error(`ERROR: invalid config key auth.${key} "${value}"`);
+        configured = false;
+      }
+    }
+    let template = 'templates/not-configured.html';
+    if( configured ) {
+      template = 'templates/index.html';
+    }
+    return await render(template, {}, __dirname);
+  }
+
   private async handleAqTouchpoint(ctx: Context, operation: string ) {
      return await render('templates/aq-touchpoint.html', {
       api: Config.get("demoTouchpoints.api"),
