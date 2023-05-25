@@ -1,10 +1,14 @@
-import { Env, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict } from '@foal/core';
+import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict } from '@foal/core';
 
 import { ApiController } from './controllers';
 import { Auth } from './services';
 import axios from 'axios';
 import { dirname } from 'path';
 
+@Hook(() => response => {
+  // Every response of this controller and its sub-controllers will be added this header.
+  response.setHeader('Access-Control-Allow-Origin', '*');
+})
 export class AppController {
   @dependency
   authService: Auth;
@@ -83,8 +87,9 @@ export class AppController {
   @Get('/minimal-demo')
   async minimalDemo(ctx: Context) {
     return await render('templates/minimal-demo.html', {
-      api: Config.get("demoTouchpoints.api")
-    },  __dirname);
+      api: Config.get("demoTouchpoints.api"),
+      touchpointId: Config.get(`demoTouchpoints.verify`),
+    }, __dirname);
   }
 
 }

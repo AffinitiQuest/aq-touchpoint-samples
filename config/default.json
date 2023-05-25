@@ -16,6 +16,11 @@
     "clientSecret": "env(AZURE_CLIENT_SECRET)"
   },
   "demoTouchpoints": {
+    "api": "https://api.affinitiquest.io",
+    "verify": "824ac419-4874-497b-db38-08db5ba36cfc",
+    "issue": "fbbc87dd-ed34-4123-db37-08db5ba36cfc"
+  },
+  "devDemoTouchpoints": {
     "api": "https://dev-api.aqvc.me",
     "verify": "c8e997f5-7742-4207-a769-6a64cac4ba90",
     "issue": "27a788e9-77f9-4ce8-8d35-112b6a10b777"
