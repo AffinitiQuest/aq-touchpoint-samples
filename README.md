@@ -357,10 +357,18 @@ When a touchpoint success event is being generated the RSA private key associate
 ### Issue Flow
 ```mermaid
  sequenceDiagram
+    actor User-Browser
+    actor User-Wallet
+    participant aq-touchpoint
+    participant Website
+    participant AQ-API
+
     User-Browser ->> Website : Open page
     Website ->> User-Browser : Page that uses <aq-touchpoint/>
     User-Browser ->> AQ-API : GET https://api.affinitiquest.io/aq-touchpoint/aq-touchpoint.js
+    AQ-API ->> User-Browser : 200 OK - <aq-touchpoint/> web component implementation
     aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something" 
+    Note over AQ-API,Website: Ask Website to provide claims attributes for credential 
     AQ-API ->> Website: GET /api/aqio/issue-attributes?app_context="something"
     Website ->> AQ-API: 200 OK {"attr1": "value", "attr2": "value"}
     AQ-API ->> aq-touchpoint: event-stream event=config including QR code 
@@ -379,9 +387,16 @@ When a touchpoint success event is being generated the RSA private key associate
 ### Verify Flow
 ```mermaid
  sequenceDiagram
+    actor User-Browser
+    actor User-Wallet
+    participant aq-touchpoint
+    participant Website
+    participant AQ-API
+
     User-Browser ->> Website : Open page
     Website ->> User-Browser : Page that uses <aq-touchpoint/>
     User-Browser ->> AQ-API : GET https://api.affinitiquest.io/aq-touchpoint/aq-touchpoint.js
+    AQ-API ->> User-Browser : 200 OK - <aq-touchpoint/> web component implementation
     aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something" 
     AQ-API ->> aq-touchpoint: event-stream event=config including QR code 
     User-Wallet ->> AQ-API : Scan QR Code POST https://api.affinitiquest.io/api/experiences/{id}/offer
