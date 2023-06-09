@@ -1,10 +1,11 @@
 {
   "name": "aq-touchpoint-demo",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "A demonstration of using the <aq-touchpoint/> custom element",
   "license": "MIT",
   "repository": {},
   "scripts": {
+    "version": "./version.mjs",
     "build": "foal rmdir build && cpx \"src/**/*.html\" build && tsc -p tsconfig.app.json",
     "start": "node ./build/index.js",
     "dev": "npm run build && concurrently \"cpx \"src/**/*.html\" build -w\" \"tsc -p tsconfig.app.json -w\" \"supervisor -w ./build,./config -e js,json,yml, html --no-restart-on error ./build/index.js\"",

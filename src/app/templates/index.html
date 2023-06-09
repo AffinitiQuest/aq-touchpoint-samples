@@ -39,12 +39,17 @@
     <thead>
         <tr>
             <th>
-                <h1><img src="/logo.png"/><span>Touchpoint Demos</span><img src="/logo.png"/></h1>
+                <h1><img src="/logo.png"/><span>Touchpoint Demos</span><span id="version"></span><img src="/logo.png"/></h1>
             </th>
         </tr>
     </thead>
     <tbody>
-        <tr>
+      <tr>
+        <td>
+           
+        </td>
+      </tr>
+      <tr>
             <td>
                 <a href="/minimal-demo">Minimal Demo - Simplest HTML</a>
             </td>
@@ -72,4 +77,14 @@
    </tbody>
   </table>
 </body>
+<script>
+  async function getAppInfo() {
+        const response = await fetch(`/app-info.json?time=${new Date().getTime()}`);
+        if( response.ok ) {
+            const appInfo = await response.json();
+            document.querySelector('#version').textContent = ` (v${appInfo.appVersion})`;
+         }
+    }
+    getAppInfo();
+</script>
 </html>
