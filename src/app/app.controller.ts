@@ -1,4 +1,4 @@
-import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict } from '@foal/core';
+import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict, ValidateQueryParam } from '@foal/core';
 
 import { ApiController } from './controllers';
 import { Auth } from './services';
@@ -19,6 +19,7 @@ export class AppController {
 
   private static operationIssue = "issue";
   private static operationVerify = "verify";
+  private static operationRevoke = "revoke";
 
   @Get('/')
   private async index(ctx: Context) {
@@ -38,17 +39,26 @@ export class AppController {
     return await render(template, {}, __dirname);
   }
 
-  private async handleAqTouchpoint(ctx: Context, operation: string ) {
-     return await render('templates/aq-touchpoint.html', {
+  private async handleAqTouchpoint(ctx: Context, operation: string, revocationHandle: string = "" ) {
+    const templateProperties = {
+      operation: operation,
       api: Config.get("demoTouchpoints.api"),
       touchpointId: Config.get(`demoTouchpoints.${operation}`),
-      title: `${operation} - &lt;aq-touchpoint/&gt;`
-    }, __dirname);
+      title: `${operation} - &lt;aq-touchpoint/&gt;`,
+      revocationHandle: revocationHandle
+    };
+     return await render('templates/aq-touchpoint.html', templateProperties, __dirname);
   }
 
   @Get('/aq-touchpoint-issue')
   async aqTouchpointIssue(ctx: Context) {
     return this.handleAqTouchpoint(ctx, AppController.operationIssue);
+  }
+
+  @Get('/aq-touchpoint-revoke')
+  @ValidateQueryParam('revocationHandle', {type: 'string'}, {required: true})
+  async aqTouchpointRevoke(ctx: Context) {
+    return this.handleAqTouchpoint(ctx, AppController.operationRevoke, ctx.request.query.revocationHandle);
   }
 
   @Get('/aq-touchpoint-verify')

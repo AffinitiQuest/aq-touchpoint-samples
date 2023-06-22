@@ -9,7 +9,7 @@ export class WebhookController {
    * @param ctx 
    * @description This webhook is invoked by the AQ API when an issuance requires claims attributes to be provided. 
    */
-  @Get('/issue-attributes')
+  @Get('/issue-attributes') // try: https://touchpoint-demo.ngrok.io/api/webhook/issue-attributes
   async issueAttributes(ctx: Context) {
     // get the credential attributes to provide in the response from configuration
     const credentialAttributes = Config.get('demoCredentialAttributes');
@@ -50,7 +50,7 @@ export class WebhookController {
    * @param ctx 
    * @description This webhook is invoked by the AQ API when an issuance succeeds. The request body includes the claims JWT 
    */
-  @Post('/issue-succeeded')
+  @Post('/issue-succeeded') // try: https://touchpoint-demo.ngrok.io/api/webhook/issue-succeeded
   async issueSucceeded(ctx: Context) {
     console.log(`${ctx.request.method} ${ctx.request.path} body=${JSON.stringify(ctx.request.body, null, 2)}`);
     await this.validateClaimsJwt(ctx);
@@ -62,7 +62,7 @@ export class WebhookController {
    * @param ctx 
    * @description This webhook is invoked by the AQ API when a verification succeeds. The request body includes the claims JWT 
    */
-  @Post('/verify-succeeded')
+  @Post('/verify-succeeded') // try: https://touchpoint-demo.ngrok.io/api/webhook/verify-succeeded
   async verifySucceeded(ctx: Context) {
     console.log(`${ctx.request.method} ${ctx.request.path} body=${JSON.stringify(ctx.request.body, null, 2)}`);
     await this.validateClaimsJwt(ctx);
