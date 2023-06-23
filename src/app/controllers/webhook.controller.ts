@@ -58,6 +58,17 @@ export class WebhookController {
   }
 
   /**
+   * @method revokeSucceeded
+   * @param ctx 
+   * @description This webhook is invoked by the AQ API when an issuance succeeds. The request body includes the claims JWT 
+   */
+  @Post('/revoke-succeeded') // try: https://touchpoint-demo.ngrok.io/api/webhook/revoke-succeeded
+  async revokeSucceeded(ctx: Context) {
+    console.log(`${ctx.request.method} ${ctx.request.path} body=${JSON.stringify(ctx.request.body, null, 2)}`);
+    return new HttpResponseOK();
+  }
+
+  /**
    * @method verifySucceeded
    * @param ctx 
    * @description This webhook is invoked by the AQ API when a verification succeeds. The request body includes the claims JWT 
