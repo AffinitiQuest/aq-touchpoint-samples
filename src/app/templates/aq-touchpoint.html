@@ -35,8 +35,9 @@
     <tbody>
       <tr>
         <td> 
-          <aq-touchpoint class="tp-light" tp_id="{{ touchpointId }}" logging="true" auth_url="/api/auth">
+          <aq-touchpoint class="tp-light" tp_id="{{ touchpointId }}" logging="true" auth_url="/api/auth" revoke_handle="{{ revocationHandle }}">
           </aq-touchpoint>    
+          <a id="revoke" hidden>Revoke this credential</a>
         </td>    
       </tr>
    </tbody>
@@ -50,10 +51,20 @@
 
       touchpoint.addEventListener('succeeded', async function(e) {
         console.log( `${new Date().toISOString()} aq-touchpoint.html - <aq-touchpoint/> succeeded=${JSON.stringify(e.detail,null,2)}`)
-        const claims = e.currentTarget.decodeJwt(e.detail.claimsJwt)
-        console.log( `claims=${JSON.stringify(claims, null, 2)}` )
-        const publicKey = await e.currentTarget.asyncGetPublicKey();
-        console.log( `publicKey\n${publicKey}\n` )
+        if( e.detail.claimsJwt ) {
+          const claims = e.currentTarget.decodeJwtPayload(e.detail.claimsJwt)
+          console.log( `claims=${JSON.stringify(claims, null, 2)}` )
+          const publicKey = await e.currentTarget.asyncGetPublicKeyForJwt(e.detail.claimsJwt);
+          console.log( `publicKey\n${publicKey}\n` )
+        }
+        if( e.detail.touchpoint.type == "issue" ) {
+          const href = `/aq-touchpoint-revoke?revocationHandle=${encodeURIComponent(e.detail.revocationHandle)}`;
+          const revokeElement = document.querySelector('#revoke');
+          if( revokeElement ) {
+            revokeElement.setAttribute('href', href);
+            revokeElement.removeAttribute('hidden')
+          }
+        }
       });
 
       touchpoint.addEventListener('failed', function(e) {
