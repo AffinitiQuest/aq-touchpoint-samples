@@ -1,0 +1,29 @@
+{
+  "port": "env(PORT)",
+  "settings": {
+    "loggerFormat": "tiny",
+    "session": {
+      "store": "@foal/typeorm"
+    }
+  },
+  "database": {
+    "type": "better-sqlite3",
+    "database": "./db.sqlite3"
+  },
+  "auth": {
+    "tenantId": "env(AZURE_TENANT_ID)",
+    "clientId": "env(AZURE_CLIENT_ID)",
+    "clientSecret": "env(AZURE_CLIENT_SECRET)"
+  },
+  "demoTouchpoints": {
+    "api": "https://api.affinitiquest.io",
+    "verify": "provide-your-own-verify-touchpoint-id-here",
+    "issue": "provide-your-own-issue-touchpoint-id-here",
+    "revoke": "provide-your-own-revoke-touchpoint-id-here",
+    "service-desk": "provide-your-own-service-desk-touchpoint-id-here"
+  },
+  "demoCredentialAttributes": {
+    "Organization": "AffinitiQuest",
+    "Name": "Warren Gallagher",
+    "Email": "warren@affinitiquest.io"
+  }}

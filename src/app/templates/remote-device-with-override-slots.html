@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Remote Device</title>
+        <link rel="shortcut icon" href="logo.png">
+        <script type="module" src="https://dev-api.aqvc.me/aq-touchpoint/aq-touchpoint.js"></script>
+        <script type="module" src="/aq-remotedevice.js"></script>
+    </head>
+
+    <body>
+        <style>
+            :root {
+              font-family: sans-serif;
+            }
+        </style>
+        <aq-remotedevice auth_url="/api/auth" logging="true">
+            <!-- 
+                The following slots represent the default UI provided by <aq-remotedevice/>. 
+                Any slot can be overriden by providing the relevant HTML.
+                Requirements:
+                Slot Name                Requirements
+                -------------------------------------
+                disconnected-state-slot
+                connected-state-slot
+                unregistered-slot        A select element with id="brand-selection". A button with id="register-device-button".
+                registered-header-slot   An optional element with class="connection-state". An optional element with id="registered-device-name".
+                idle-slot
+                running-slot
+            -->
+            <span slot="disconnected-state-slot"><span id="disconnected-state">🔴</span></span>
+            <span slot="connected-state-slot"><span id="connected-state">✅</span></span>
+            <div slot="unregistered-slot">
+                <div id="unregistered">
+                    <h3>Register Remote Device: <span>🔴</span></h3>
+                    <div style="padding-bottom: 6px;">
+                        <label for="brand-selection">Choose Brand</label>
+                        <select name="brand-selection" id="brand-selection"></select>
+                    </div>
+                    <div style="padding-bottom: 6px;">
+                        <label for="name">Device Name</label>
+                        <input name="name" id="name">
+                    </div>
+                    <div style="padding-bottom: 6px;">
+                        <label for="description">Device Description</label>
+                        <input name="description" id="description">
+                    </div>
+                    <div style="padding-bottom: 6px;">
+                        <label for="title">Device Title</label>
+                        <input name="title" id="title">
+                    </div>
+                    <div style="padding-bottom: 6px;">
+                        <button id="register-device-button">Register</button>
+                    </div>
+                </div>
+            </div>
+            <div slot="registered-header-slot">
+                <h3 id="registered-header">Registered Device: <span id="registered-device-name"></span> <span class="connection-state">🔴</span></h3>
+            </div>
+            <div slot="idle-slot">
+                <div id="idle">Idle</div>
+            </div>
+            <div slot="running-slot">
+                <div id="running"></div>
+            </div>
+        </aq-remotedevice>
+    </body>
+
+</html>

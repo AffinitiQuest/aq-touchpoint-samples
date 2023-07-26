@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Service Desk</title>
+        <link rel="shortcut icon" href="logo.png">
+        <script type="module" src="https://dev-api.aqvc.me/aq-touchpoint/aq-touchpoint.js"></script>
+        <script type="module" src="/aq-servicedesk.js"></script>
+    </head>
+    
+    <body>
+        <style>
+            :root {
+              font-family: sans-serif;
+            }
+        </style>
+        <aq-servicedesk tp_id="6f22f6ac-955d-4c7b-223e-08db797c077a" auth_url="/api/auth" logging="true">
+            <span slot="disconnected-state-slot"><span id="disconnected-state">🔴</span></span>
+            <span slot="connected-state-slot"><span id="connected-state">✅</span></span>
+            <span slot="run-cmd-slot"><span id="run-cmd">▶️</span></span>
+            <span slot="stop-cmd-slot"><span id="stop-cmd">⏹️</span></slot></span>
+            <div slot="header-slot">
+                <div id="header">
+                    <h3>Service Desk: <span id="service-desk-app-name"></span> <span class="connection-state">🔴</span></h3>
+                </div>
+            </div>
+            <div slot="offers-and-checks-slot">
+                <div slot="offers-and-checks">
+                    <style>
+                        
+                        table, th, td {
+                        border: 1px solid black;
+                        border-collapse: collapse;
+                        }
+                        th {
+                            color: #feb839;
+                            background-color: #152c61;
+                        }
+                        .table-title {
+                            width: 300px;
+                        }
+                    </style>
+                    <details>
+                        <summary>Offers</summary>
+                        <table>
+                            <thead>
+                                <th class="table-title" >Offers</th>
+                                <th>Actions</th>
+                                <th>Status</th>
+                            </thead>
+                            <tbody id="offers-list">
+        
+                            </tbody>
+                        </table>
+                    </details>
+                    <details>
+                        <summary>Checks</summary>
+                        <table>
+                            <thead>
+                                <th class="table-title">Checks</th>
+                                <th>Actions</th>
+                                <th>Status</th>
+                            </thead>
+                            <tbody id="checks-list">
+        
+                            </tbody>
+                        </table>
+                    </details>
+                </div>
+            </div>
+        </aq-servicedesk>
+    </body>
+
+</html>

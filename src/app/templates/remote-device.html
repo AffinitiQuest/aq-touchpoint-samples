@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Remote Device</title>
+        <link rel="shortcut icon" href="logo.png">
+        <script type="module" src="{{ api }}/aq-touchpoint/aq-touchpoint.js"></script>
+        <script type="module" src="{{ api }}/aq-touchpoint/aq-remotedevice.js"></script>
+    </head>
+
+    <body>
+        <style>
+            :root {
+              font-family: sans-serif;
+            }
+        </style>
+        <aq-remotedevice auth_url="/api/auth" logging="true" show_claims="true">
+        </aq-remotedevice>
+    </body>
+
+</html>

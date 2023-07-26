@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{{ title }} </title>
+  <link rel="shortcut icon" href="logo.png">
+  <style>
+  </style>
+  <script type="module" src="{{ api }}/aq-touchpoint/aq-touchpoint.js" ></script>
+</head>
+<body>
+  <style>
+    :root {
+      color-scheme: light;
+      --background-color: white;
+      --color: black;
+      font-family: sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+          --background-color: black;
+          --color: white;
+        }
+    }
+    table {
+      margin-left:auto; 
+      margin-right:auto;
+    }
+    td {
+      text-align: center;
+    }
+  </style>
+  <table>
+    <tbody>
+      <tr>
+        <td> 
+          <aq-touchpoint class="tp-light" tp_id="{{ touchpointId }}" logging="true" auth_url="/api/auth" revoke_handle="{{ revocationHandle }}">
+          </aq-touchpoint>    
+          <a id="revoke" hidden>Revoke this credential</a>
+        </td>    
+      </tr>
+   </tbody>
+  </table>
+  <script>
+    const touchpoints = document.querySelectorAll('aq-touchpoint')
+    for( const touchpoint of touchpoints ) {
+      touchpoint.addEventListener('triggered', function(e) {
+        console.log( `${new Date().toISOString()} aq-touchpoint.html - <aq-touchpoint/> triggered=${JSON.stringify(e.detail,null,2)}`)
+      });
+
+      touchpoint.addEventListener('succeeded', async function(e) {
+        console.log( `${new Date().toISOString()} aq-touchpoint.html - <aq-touchpoint/> succeeded=${JSON.stringify(e.detail,null,2)}`)
+        if( e.detail.claimsJwt ) {
+          const claims = e.currentTarget.decodeJwtPayload(e.detail.claimsJwt)
+          console.log( `claims=${JSON.stringify(claims, null, 2)}` )
+          const publicKey = await e.currentTarget.asyncGetPublicKeyForJwt(e.detail.claimsJwt);
+          console.log( `publicKey\n${publicKey}\n` )
+        }
+        if( e.detail.touchpoint.type == "issue" ) {
+          const href = `/aq-touchpoint-revoke?revocationHandle=${encodeURIComponent(e.detail.revocationHandle)}`;
+          const revokeElement = document.querySelector('#revoke');
+          if( revokeElement ) {
+            revokeElement.setAttribute('href', href);
+            revokeElement.removeAttribute('hidden')
+          }
+        }
+      });
+
+      touchpoint.addEventListener('failed', function(e) {
+        console.log( `${new Date().toISOString()} aq-touchpoint.html - <aq-touchpoint/> failed=${JSON.stringify(e.detail,null,2)}`)
+      });
+
+      touchpoint.addEventListener('timeout', function(e) {
+        console.log( `${new Date().toISOString()} aq-touchpoint-verify.html - <aq-touchpoint/> timeout`)
+      });
+      
+      touchpoint.addEventListener('unauthorized', function(e) {
+        console.log( `${new Date().toISOString()} aq-touchpoint-verify.html - <aq-touchpoint/> unauthorized. Token expired?`)
+      });
+    }
+
+  </script>
+</body>
+</html>

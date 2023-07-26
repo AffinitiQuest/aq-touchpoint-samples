@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Touchpoint Demos</title>
+  <link rel="shortcut icon" href="logo.png">
+  <style>
+  </style>
+</head>
+<body>
+  <style>
+    :root {
+      color-scheme: light;
+      --background-color: white;
+      --color: black;
+      font-family: sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+          --background-color: black;
+          --color: white;
+        }
+    }
+    table {
+      margin-left:auto; 
+      margin-right:auto;
+    }
+    td {
+      text-align: center;
+      padding: 10px;
+    }
+    img {
+        width: 50px;
+    }
+  </style>
+  
+  <table>
+    <thead>
+        <tr>
+            <th>
+                <h1><img src="/logo.png"/><span>Touchpoint Demos</span><span id="version"></span><img src="/logo.png"/></h1>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+           
+        </td>
+      </tr>
+      <tr>
+            <td>
+                <a href="/minimal-demo">Minimal Demo - Simplest HTML</a>
+            </td>
+      </tr>
+      <tr>
+        <td>
+            <a href="/aq-touchpoint-issue">Issue using &lt;aq-touchpoint/&gt; Web Component with events</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <a href="/aq-touchpoint-verify">Verify using &lt;aq-touchpoint/&gt; Web Component with events</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <a href="/open-touchpoint-issue">Issue using POST /api/touchpoint/{touchpointId}/open</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <a href="/open-touchpoint-verify">Verify using POST /api/touchpoint/{touchpointId}/open</a>
+        </td>
+      </tr>
+      <tr>
+        <td><a href="/service-desk" target="_blank">Service Desk using &lt;aq-servicedesk/&gt; Web Component</a></td>
+      </tr>
+      <tr>
+        <td><a href="/remote-device" target="_blank">Remote Device using &lt;aq-remotedevice/&gt; Web Component</a></td>
+      </tr>
+ </tbody>
+  </table>
+</body>
+<script>
+  async function getAppInfo() {
+        const response = await fetch(`/app-info.json?time=${new Date().getTime()}`);
+        if( response.ok ) {
+            const appInfo = await response.json();
+            document.querySelector('#version').textContent = ` (v${appInfo.appVersion})`;
+         }
+    }
+    getAppInfo();
+</script>
+</html>
