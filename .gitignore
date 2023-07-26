@@ -5,6 +5,8 @@ build/
 .env
 .env.local
 .env.*.local
+development.env
+production.env
 *.sqlite3
 *.sqlite3-journal
 *.sqlite3-shm
