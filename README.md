@@ -151,6 +151,7 @@ Kicks off the invocation of a TouchPoint by id AND opens a text/event-stream. Th
   },
   "appContext": "",
   "claimsJwt": "see claimsJwt³ formats below",
+  "credentialDesignId": "f24502f1-f023-4cee-b341-a5f076584683"
   "revocationHandle": "This will only be provided on issuance for revocable credentials"
 }
 ```
