@@ -50,33 +50,20 @@ npm run dev
 
 ## Integrating your Application using AffinitiQuest Touchpoints
 
-AffinitiQuest introduces an abstraction called a "TouchPoint" (TP). TouchPoints are comprised of multiple parts:
-- a database entity. 
-- a management User Interface.
-- a web component.
-- a set of web APIs.
-- a webhook events representing successfull execution of the TouchPoint operation.
+The AffinitiQuest Credential Orchestration system provides an abstraction called "TouchPoint" (TP). TouchPoints provide easy integration for 3rd-party applications. A touchpoint is configured through the AffinitiQuest administration portal.
 
-### TouchPoint Entity
-Each TouchPoint Entity contains:
-``` json
-{
-  "id":  "<touchPointId>",
-  "name": "<TouchPoint Name>", 
-  "description": "a description of what this touchpoint is used for",
-  "title": "Title shown on <aq-touchpoint/> component",
-  "walletName": "Name of Wallet shown in <aq-touchpoint/> component",
-  "brandId": "<brandId>",
-  "operation": {
-    "type": "<issue|verify>",
-    "id": "<credentialDesignId|proofDesignId>",
-    "timeToLiveInSeconds": 600
-  },
-  "issueAttributesWebhookUrl": "<url> | null", // webhook invoked to request issuance attributes
-  "successWebhookUrl": "<url> | null",   // webhook invoked on success
-  "webhookHeaders": "<jsonStringArrayOfNameValuePairs> | null"
-}
-```
+There are three primitive touchpoint types that can be configured:
+- Issue
+  - used to issue a credential and is bound to a particular credential design and issuer
+  - the 3rd-party may provide a webhook that can be used to fetch the attribute values that should be used in the credential
+  - the 3rd-party may provide a webhook that can be used to notify that a credential has been successfully issued.
+- Verify
+  - used to verify a credential and is bound to a particular proof design
+  - the 3rd-party may provide a webhook that can be used to notify that a credential has been successfully verified.
+- Revoke
+  - used to revoke a credential and is bound to a particular credential design and issuer
+
+Each configured touchpoint is assigned a unique identifier.
 
 ### TouchPoint Web APIs 
 
@@ -347,11 +334,6 @@ As a result there is a need to generate and manage RSA keys used for this purpos
 #### Key Generation
 When a new brand is created a 2048 bit RSA key pair will be generated and stored.
 
-### Key Storage
-A database table called BrandKeys will be created that associates a brandId with the public key and private key. The private key will be encrypted.
-
-A future variation will add a new table called TouchpointKeys that associates a touchpointId with a public/private key pair. The private key will be encrypted.
-
 #### Signing JWT
 When a touchpoint success event is being generated the RSA private key associated with the brand to which the TouchPoint belongs will be retrieved and used to sign the claimsJwt.
 
@@ -370,6 +352,10 @@ When a touchpoint success event is being generated the RSA private key associate
     Website ->> User-Browser : Page that uses <aq-touchpoint/>
     User-Browser ->> AQ-API : GET https://api.affinitiquest.io/aq-touchpoint/aq-touchpoint.js
     AQ-API ->> User-Browser : 200 OK - <aq-touchpoint/> web component implementation
+    aq-touchpoint ->> Website : GET /api/auth
+    Website ->> AQ-API : POST /api/authenticate
+    AQ-API ->> Website: 200 OK with auth token
+    Website ->> aq-touchpoint : 200 OK with auth token
     aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something" 
     Note over AQ-API,Website: Ask Website to provide claims attributes for credential 
     AQ-API ->> Website: GET /api/aqio/issue-attributes?app_context="something"
@@ -400,6 +386,10 @@ When a touchpoint success event is being generated the RSA private key associate
     Website ->> User-Browser : Page that uses <aq-touchpoint/>
     User-Browser ->> AQ-API : GET https://api.affinitiquest.io/aq-touchpoint/aq-touchpoint.js
     AQ-API ->> User-Browser : 200 OK - <aq-touchpoint/> web component implementation
+    aq-touchpoint ->> Website : GET /api/auth
+    Website ->> AQ-API : POST /api/authenticate
+    AQ-API ->> Website: 200 OK with auth token
+    Website ->> aq-touchpoint : 200 OK with auth token
     aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something" 
     AQ-API ->> aq-touchpoint: event-stream event=config including QR code 
     User-Wallet ->> AQ-API : Scan QR Code POST https://api.affinitiquest.io/api/experiences/{id}/offer

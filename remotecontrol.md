@@ -10,13 +10,14 @@ Envision a company that is a customer of the AffinitiQuest platform and that has
 
 * a web application used by their employees to provide customer service
 * a web application running in a device (perhaps a kiosk) that is used by customers of the company
+* (Note that these could be the same application)
 
 The customer service agent app could embed the ```<aq-servicedesk/>``` component into one or more pages.
 
 The end-customer facing app could embed the ```<aq-remotedevice/>``` component.
 
 The ```<aq-servicedesk/>``` component allows the customer service agent to push commands to the ```<aq-remotedevice/>```,
-thus acting as a remote control.
+thus acting as a remote control. Note that the connections between the components are based on websockets and that the AffinitiQuestPlatform brokers these connections and routes the messages.
 
 ```mermaid
  sequenceDiagram
@@ -29,8 +30,8 @@ thus acting as a remote control.
     actor Customer
 
     PageWith-aq-servicedesk ->> ServiceDeskAppServer : Get Auth Token
-    ServiceDeskAppServer ->> PageWith-aq-servicedesk : requested Auth Token 
     PageWith-aq-remotedevice ->> CustomerAppServer : Get Auth Token
+    ServiceDeskAppServer ->> PageWith-aq-servicedesk : requested Auth Token 
     CustomerAppServer ->> PageWith-aq-remotedevice : requested Auth Token
     CustomerServiceAgent ->> PageWith-aq-servicedesk : Run Command for selected touchpoint
     PageWith-aq-servicedesk ->> AffinitiQuestPlatform : Run Command for selected touchpoint
@@ -137,15 +138,15 @@ The following are events that are dispatched by the component. You can receive t
 | 'failed' | event handler fired when a running embedded touchpoint has finished in failure |
 | 'timeout' | event handler fired when a running embedded touchpoint has finished in timeout |
 
-### ```<aq-servicedevice/>``` Component Details
+### ```<aq-servicedesk/>``` Component Details
 
-```<aq-servicedevice/>``` is a HTML custom element or web component that can be added to a page so that it can act as a remote device. To use this component and the ```<aq-touchpoint/>``` the following script tags should be added to the header area of the hosting HTML file:
+```<aq-servicedesk/>``` is a HTML custom element or web component that can be added to a page so that it can act as a service desk or portal to control other ```<aq-remotedevice/>``` instances. To use this component and the ```<aq-touchpoint/>``` the following script tags should be added to the header area of the hosting HTML file:
 ```html
 <script type="module" src="https://api.affinitiquest.io/aq-touchpoint/aq-touchpoint.js"></script>
 <script type="module" src="https://api.affinitiquest.io/aq-touchpoint/aq-servicedesk.js"></script>
 ```
 
-In the simplest use of ```<aq-servicedevice/>``` add something similar to the following somewhere in the body of the HTML file:
+In the simplest use of ```<aq-servicedesk/>``` add something similar to the following somewhere in the body of the HTML file:
 ```HTML
 <aq-servicedesk auth_url="/api/auth" tp_id="your-touchpoint-id-goes-here">
 </aq-remote-device>
@@ -164,8 +165,10 @@ The following are attributes that can be provided to the component:
 | auth_url | required unless auth_jwt is provided |
 | auth_method | optional - specifies the HTTP method to use with auth_url, defaults to GET |
 | auth_jwt | required unless auth_url is provided |
+| lang | optional - defaults to "en-ca"  |
 | app_context | optional - passed as app_context to remote device when told to run  |
 | logging | log to browser console "true" or "false". default = "false" |
+| show_claims | optional - upon successfully running a verify, show the verified claims "true" or "false", default = "false"
 
 #### ```<aq-servicedesk/>``` Events
 
