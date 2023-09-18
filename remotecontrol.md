@@ -4,6 +4,8 @@ The AffinitiQuest platform for orchestration of verifiable credentials has a set
 
 These components build atop the touchpoint foundation provided by the platform. The first two of these components are ```<aq-servicedesk/>``` and ```<aq-remotedevice/>```.
 
+For security considerations on use of touchpoints please see: [Touchpoint Security Considerations](security.md)
+
 ## High Level
 
 Envision a company that is a customer of the AffinitiQuest platform and that has:
