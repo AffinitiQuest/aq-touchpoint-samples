@@ -74,11 +74,12 @@ Example code:
 ```javascript
 const touchpointElement = document.querySelector('aq-touchpoint');
 if( touchpointElement ) {
-    touchpointElement.addEventListener('reauthorize', function(event) {
+    touchpointElement.addEventListener('unauthorized', function(event) {
         // use whatevent means to get a new JWT access token. In this case assume session cookies are being used.
         const response = await fetch('/api/auth');
         if(response.ok) {
             const accessToken = await response.text();
+            // update the 'auth_jwt' attribute of the element to use the new access token
             event.currentTarget.setAttribute('auth_jwt', accessToken );
         }
     });
