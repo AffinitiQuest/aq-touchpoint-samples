@@ -4,6 +4,7 @@ A FoalTS-based app that demonstrates use of the ```<aq-touchpoint/>``` component
 
 This app also demonstrates how to use ```<aq-servicedesk/>``` and ```<aq-remotedevice/>```. For descriptions of these components, please see: [Remote Control](remotecontrol.md).
 
+For security considerations on use of touchpoints please see: [Touchpoint Security Considerations](security.md)
 ## Requirements
 
 - NodesJS >= 18
