@@ -26,4 +26,8 @@
     "Organization": "AffinitiQuest",
     "Name": "Warren Gallagher",
     "Email": "warren@affinitiquest.io"
-  }}
+  },
+  "url": {
+    "signatureSecret": "my-url-signing-secret"
+  }
+}

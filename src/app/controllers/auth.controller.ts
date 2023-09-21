@@ -1,4 +1,4 @@
-import { Context, Get, HttpResponseOK, HttpResponseUnauthorized, dependency } from '@foal/core'
+import { Context, Get, HttpResponseOK, dependency } from '@foal/core'
 import { Auth } from '../services';
 
 export class AuthController {

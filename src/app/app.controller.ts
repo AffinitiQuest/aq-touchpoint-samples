@@ -3,7 +3,7 @@ import { Hook, Context, controller, Get, dependency, render, Config, HttpRespons
 import { ApiController } from './controllers';
 import { Auth } from './services';
 import axios from 'axios';
-import { dirname } from 'path';
+import signed from 'signed';
 
 @Hook(() => response => {
   // Every response of this controller and its sub-controllers will be added this header.
@@ -17,18 +17,20 @@ export class AppController {
     controller('/api', ApiController),
   ];
 
-  private static operationIssue = "issue";
-  private static operationVerify = "verify";
-  private static operationRevoke = "revoke";
+  private static operationIssue = 'issue';
+  private static operationVerify = 'verify';
+  private static operationRevoke = 'revoke';
+
+  private signature = signed({secret: Config.get('url.signatureSecret'), hash: 'sha256', ttl: 60*60*24});
 
   @Get('/')
   private async index(ctx: Context) {
-    const authConfig = Config.get("auth");
+    const authConfig = Config.getOrThrow('auth');
     let configured = true;
     for( const key in authConfig ) {
-      const value = Config.get(`auth.${key}`);
+      const value = Config.getOrThrow(`auth.${key}`, 'string');
       if( value == undefined || value.includes('<') || value.includes('>') || value.toLowerCase().includes('azure') ) {
-        console.error(`ERROR: invalid config key auth.${key} "${value}"`);
+        console.error(`ERROR: invalid config key auth.${key} '${value}'`);
         configured = false;
       }
     }
@@ -39,12 +41,13 @@ export class AppController {
     return await render(template, {}, __dirname);
   }
 
-  private async handleAqTouchpoint(ctx: Context, operation: string, revocationHandle: string = "" ) {
+  private async handleAqTouchpoint(ctx: Context, operation: string, revocationHandle = '' ) {
     const templateProperties = {
       operation: operation,
-      api: Config.get("demoTouchpoints.api"),
+      api: Config.get('demoTouchpoints.api'),
       touchpointId: Config.get(`demoTouchpoints.${operation}`),
       title: `${operation} - &lt;aq-touchpoint/&gt;`,
+      appContext: this.signature.sign( Config.get('demoCredentialAttributes.Email') ),
       revocationHandle: revocationHandle
     };
      return await render('templates/aq-touchpoint.html', templateProperties, __dirname);
@@ -69,18 +72,22 @@ export class AppController {
   private async handleOpenTouchpoint( ctx: Context,  operation: string ) {
     // we need an auth token to use in our call to the AffinitiQuest API
     const token = await this.authService.getAccessToken();
+    if( typeof token !== 'string') {
+      return token;
+    }
 
     // prepare to make the API call
-    const touchpointId = Config.get(`demoTouchpoints.${operation}`);
+    const touchpointId = Config.getOrThrow(`demoTouchpoints.${operation}`, 'string');
+    const appContext = this.signature.sign(Config.get('demoCredentialAttributes.Email'));
     const options = {
-      url: `${Config.get("demoTouchpoints.api")}/api/touchpoint/${touchpointId}/open`,
+      url: `${Config.getOrThrow('demoTouchpoints.api', 'string')}/api/touchpoint/${touchpointId}/open?appContext=${appContext}`,
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`      }
     };
     try {
       // make the API call to open the touchpoint
-      const {data, status, headers} = await axios.request(options);
+      const {data, status} = await axios.request(options);
       if( status != 200 ) {
         return new HttpResponseBadRequest({status: status, error: data});
       }
@@ -93,11 +100,11 @@ export class AppController {
         brandLogo: data.brand.logo,
         touchpointTitle: data.touchpoint.title,
         qrcode: data.action.qrcode,
-        wallet: "Microsoft Authenticator"
+        wallet: 'Microsoft Authenticator'
       }, __dirname);
     }
     catch( e ) {
-      console.log( `handleOpenTouchpoint Failed`);
+      console.log( 'handleOpenTouchpoint Failed');
     }
     return new HttpResponseConflict();
   }
@@ -115,16 +122,18 @@ export class AppController {
   @Get('/minimal-demo')
   async minimalDemo(ctx: Context) {
     return await render('templates/minimal-demo.html', {
-      api: Config.get("demoTouchpoints.api"),
-      touchpointId: Config.get(`demoTouchpoints.verify`),
+      api: Config.get('demoTouchpoints.api'),
+      touchpointId: Config.get('demoTouchpoints.verify'),
+      appContext: this.signature.sign( Config.get('demoCredentialAttributes.Email') )
     }, __dirname);
   }
 
   @Get('/service-desk')
   async serviceDesk(ctx: Context) {
     const templateProperties = {
-      api: Config.get("demoTouchpoints.api"),
-      touchpointId: Config.get(`demoTouchpoints.service-desk`)
+      api: Config.get('demoTouchpoints.api'),
+      touchpointId: Config.get('demoTouchpoints.service-desk'),
+      appContext: this.signature.sign( Config.get('demoCredentialAttributes.Email') )
     };
      return await render('templates/service-desk.html', templateProperties, __dirname);
   }
@@ -132,7 +141,7 @@ export class AppController {
   @Get('/remote-device')
   async remoteDevice(ctx: Context) {
     const templateProperties = {
-      api: Config.get("demoTouchpoints.api")
+      api: Config.get('demoTouchpoints.api')
     };
     return await render('templates/remote-device.html', templateProperties, __dirname);
   }

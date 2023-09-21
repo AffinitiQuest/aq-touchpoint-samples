@@ -1,4 +1,4 @@
-import { Class, Context, Get, HttpResponseOK, controller, IAppController, IController } from '@foal/core';
+import { controller, IAppController } from '@foal/core';
 import { AuthController, WebhookController } from './index';
 
 export class ApiController implements IAppController{
