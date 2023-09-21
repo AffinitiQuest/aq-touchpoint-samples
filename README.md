@@ -235,7 +235,7 @@ TouchpointDescriptor Response Body
 }
 
 ```
-#### GET /api/touchpoint/{touchpointId}/publickey
+#### GET /api/touchpoint/{touchpointId}/publickey/{kid}
 Retrieves the publicKey used to validate the claimsJWT
 
 ResponseBody with Content-Type: application/x-pem-file
@@ -250,13 +250,27 @@ rN6tAwz+4K07JqIg2ehp/nZjVeVmnwIK1wIDAQAB
 -----END PUBLIC KEY-----
 ```
 
+#### POST /api/touchpoint/{touchpointId}/validate-claims-jwt
+Validates a jwt associated with a touchpoint.
+
+POST Request Body
+```json
+{
+  "jwt": "the-jwt-value"
+}
+```
+
+ResponseBody with Content-Type: /application/json
+See [ClaimsJwt Format For Issuance](#claimsjwt-format-for-issuance).
+See [ClaimsJwt Format For Verification](#claimsjwt-format-for-verification)
+
 ### TouchPoint Webhooks
 
 ### TouchPoint Issue Attributes Request Webhook
 If a TouchPoint entity includes a issueAttributesWebhookUrl then, upon TouchPoint open, the webhook will be invoked by issuing an HTTP GET to the specified url with any specified headers. An optional query parameter app_context may be provided if the open request on the webhook provided an app_context.
 
 The invocation will be something like
-GET <issueAttributeWebhookUrl>?app_context=<providedAppContext>
+GET <issueAttributeWebhookUrl>?touchpointId=<some-touchpoint-id>&jwt=<jwt-value>&app_context=<providedAppContext>
 
 This should return a JSON payload that describes the attributes to be populated in the credential. This should reflect the attributes described in the Credential Design created in the AffinitiQuest admin portal.
 
@@ -289,7 +303,7 @@ Webhook Request Body
   "revocationHandle": "This will only be supplied on issuance for revokable credentials"
 }
 ```
-If the webhook consumer wishes to validate the received JWT, it must have access to the public key. This can either be provisioned in the webhook consumer app or it can retrieve it dynamically using the previously described web API GET /api/touchpoint/{touchpointId}/publickey
+If the webhook consumer wishes to validate the received JWT, it must have access to the public key. This can either be provisioned in the webhook consumer app or it can retrieve it dynamically using the previously described web API GET /api/touchpoint/{touchpointId}/publickey/{kid}
 
 ### TouchPoint Web Component - **```<aq-touchpoint/>```**
 A new web component will be introduced that will replace the existing components. This component will be **```<aq-touchpoint/>```**.

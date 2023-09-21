@@ -130,6 +130,19 @@ be provided to a dynamically run ```<aq-touchpoint/>``` unless ```app_context```
 What this means is that an ```app_context``` provided by ```<aq-servicedesk/>``` will take precedence over an 
 ```app_context``` provided by ```<aq-remotedevice/>```.
 
+## Webhooks and JWTs
+When a verification or issuance success webhook is invoked, the POST body contains a ```claimsJwt``` property that is a signed JSON Web Token.
+
+When a a get-attributes webhook is invoked the request URL contains a ```jwt``` query parameter.
+
+The webhook handler should validate the signatures of the JWT before trusting the content.
+
+To validate this JWT yourself using the public key:
+* Retrieve the public key as described [here](README.md#get-apitouchpointtouchpointidpublickey)
+* validate the JWT using the ```claimsJwt``` and the public key using a library such as those [here](https://jwt.io/libraries)
+
+To validate this JWT using a provided AffinitiQuest API, see [here.](README.md#post-apitouchpointtouchpointidvalidate-claims-jwt)
+
 ## Attribute/URL signing
 
 Whenever information such as URLs or attributes are being passed around, it may be necessary to know they have not been tampered with. A web browser must be considered a hostile and adversarial environment.
