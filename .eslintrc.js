@@ -23,6 +23,7 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/quotes': ['error', 'single'],
+    '@typescript-eslint/restrict-template-expressions': 'off',
     'arrow-parens': ['error', 'as-needed'],
     'max-classes-per-file': 'off',
     'no-console': 'off',
@@ -43,6 +44,6 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'off',
   },
   ignorePatterns: [
-    'src/migrations/*.ts'
+    '.eslintrc.js'
   ]
 };
