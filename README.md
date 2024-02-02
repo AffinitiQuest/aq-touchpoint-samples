@@ -14,9 +14,9 @@ For security considerations on use of touchpoints please see: [Touchpoint Securi
 
 ```sh
 # install node module dependencies
-npm install 
+npm install
 # install the FoalTS CLI
-npm install -g @foal/cli 
+npm install -g @foal/cli
 ```
 
 ## Configuration
@@ -34,7 +34,7 @@ vi .env
 
 ```sh
 #run the development server
-npm run dev 
+npm run dev
 ```
 
 ## Open static page
@@ -66,7 +66,7 @@ There are three primitive touchpoint types that can be configured:
 
 Each configured touchpoint is assigned a unique identifier.
 
-### TouchPoint Web APIs 
+### TouchPoint Web APIs
 
 #### POST /api/authenticate
 Requests a JWT token to be used with other API calls,
@@ -273,15 +273,59 @@ The invocation will be something like
 GET <issueAttributeWebhookUrl>?touchpointId=<some-touchpoint-id>&jwt=<jwt-value>&app_context=<providedAppContext>
 
 This should return a JSON payload that describes the attributes to be populated in the credential. This should reflect the attributes described in the Credential Design created in the AffinitiQuest admin portal.
+The validFrom value defaults to the time of issuance.
+The validUntil value defaults to the time of issuance plus the expiry in the credential design.
+The format of the claims should reflect the values expected by the type of credential.  For example, if it is a
+verified credential, it should contain the attribute values expected for that credential design schema.
+If it is an mdoc, it should match the expected mdoc format..
 
+|Attribute Name| Description |
+|--|--|
+| validFrom | optional - string indicating the mdoc validFrom date for the credential. Default is the time of issuance |
+| validUntil | optional - string indicating the mdoc validUntil date for the credential. Default is the valueFrom date added with the expiry value defined in the credential design|
+| claims | an object indicating the credential attributes or mdoc values|
+
+VC example response
 ``` json
 200 OK
 Webhook Response Body
 {
-  "attributeName1": "attributeValue",
-  "attributeName2": "attributeValue"
+  "validFrom": "2024-02-02T14:33:29.380Z",
+  "validUntil": "2024-02-16T14:33:29.380Z",
+  "claims": {
+    "attributeName1": "attributeValue1",
+    "attributeName2": "attributeValue2"
+  }
 }
 ```
+
+MDOC example response
+``` json
+200 OK
+Webhook Response Body
+{
+  "validFrom": "2024-02-02T14:33:29.380Z",
+  "validUntil": "2024-02-16T14:33:29.380Z",
+  "claims": {
+    "docType": "com.example.mdoc.mydoc.1",
+    "namespaces": [
+        {
+          "com.example.mdoc.mydoc.1": {
+            "attributeName1": "attributeValue1"
+          }
+        },
+        {
+          "com.example.mdoc.mydoc.personal.1": {
+            "personalAttributeName1": "personalAttributeValue1",
+            "personalAttributeName2": "personalAttributeValue2",
+          }
+        }
+      ]
+  }
+}
+```
+
+
 
 ### TouchPoint Success Webhook
 If a TouchPoint entity includes a successWebhookUrl then, upon TouchPoint success the webhook will be invoked by executing an HTTP POST to the specified url with any specified headers.
@@ -324,7 +368,7 @@ Events sent over the text/event-stream from the server to the web component.
 |Event| Description |
 |--|--|
 | triggered | a wallet has scanned the QRcode |
-| unauthorized | open touchpoint with supplied auth_jwt failed with 401. Likely token expired. | 
+| unauthorized | open touchpoint with supplied auth_jwt failed with 401. Likely token expired. |
 | failed | the touchpoint has failed |
 | succeeded | the touchpoint has succeeded |
 | timeout | the touchpoint has not completed within the allotted time |
@@ -371,19 +415,19 @@ When a touchpoint success event is being generated the RSA private key associate
     Website ->> AQ-API : POST /api/authenticate
     AQ-API ->> Website: 200 OK with auth token
     Website ->> aq-touchpoint : 200 OK with auth token
-    aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something" 
-    Note over AQ-API,Website: Ask Website to provide claims attributes for credential 
+    aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something"
+    Note over AQ-API,Website: Ask Website to provide claims attributes for credential
     AQ-API ->> Website: GET /api/aqio/issue-attributes?app_context="something"
     Website ->> AQ-API: 200 OK {"attr1": "value", "attr2": "value"}
-    AQ-API ->> aq-touchpoint: event-stream event=config including QR code 
+    AQ-API ->> aq-touchpoint: event-stream event=config including QR code
     User-Wallet ->> AQ-API : Scan QR Code POST https://api.affinitiquest.io/api/interactions/{id}/offer
-    AQ-API ->> aq-touchpoint: event-stream event=triggered 
+    AQ-API ->> aq-touchpoint: event-stream event=triggered
     aq-touchpoint ->> User-Browser: Invoke registered event=triggered handler
     User-Wallet ->> AQ-API : Credential Accepted
     Note over AQ-API,Website: issue-success-webhook event includes claims JWT
     AQ-API ->> Website: POST /api/aqio/issue-success-webhook
     Website ->> AQ-API: 200 OK
-    Note over AQ-API,aq-touchpoint: succeeded event includes claims JWT 
+    Note over AQ-API,aq-touchpoint: succeeded event includes claims JWT
     AQ-API ->> aq-touchpoint: event-stream event=succeeded
     aq-touchpoint ->> User-Browser: Invoke registered event=succeeded handler
 ```
@@ -405,10 +449,10 @@ When a touchpoint success event is being generated the RSA private key associate
     Website ->> AQ-API : POST /api/authenticate
     AQ-API ->> Website: 200 OK with auth token
     Website ->> aq-touchpoint : 200 OK with auth token
-    aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something" 
-    AQ-API ->> aq-touchpoint: event-stream event=config including QR code 
+    aq-touchpoint ->> AQ-API: GET /api/touchpoint/{tpId}/open/events?app_context="something"
+    AQ-API ->> aq-touchpoint: event-stream event=config including QR code
     User-Wallet ->> AQ-API : Scan QR Code POST https://api.affinitiquest.io/api/experiences/{id}/offer
-    AQ-API ->> aq-touchpoint: event-stream event=triggered 
+    AQ-API ->> aq-touchpoint: event-stream event=triggered
     aq-touchpoint ->> User-Browser: Invoke registered event=triggered handler
     AQ-API ->> User-Wallet : Send credential presentation request
     User-Wallet ->> AQ-API : Presentaion Shared
@@ -419,5 +463,3 @@ When a touchpoint success event is being generated the RSA private key associate
     AQ-API ->> aq-touchpoint: event-stream event=succeeded
     aq-touchpoint ->> User-Browser: Invoke registered event=succeeded handler
 ```
-
-

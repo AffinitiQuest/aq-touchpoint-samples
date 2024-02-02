@@ -1,13 +1,12 @@
 import { Context, Get, Post, HttpResponseOK, Config } from '@foal/core'
-import * as Msal from '@azure/msal-node'
 import axios from 'axios';
 
 export class WebhookController {
 
   /**
    * @method issueAttributes
-   * @param ctx 
-   * @description This webhook is invoked by the AQ API when an issuance requires claims attributes to be provided. 
+   * @param ctx
+   * @description This webhook is invoked by the AQ API when an issuance requires claims attributes to be provided.
    */
   @Get('/issue-attributes') // try: https://touchpoint-demo.ngrok.io/api/webhook/issue-attributes
   async issueAttributes(ctx: Context) {
@@ -19,19 +18,20 @@ export class WebhookController {
 
   /**
    * @method validateClaimsJwt
-   * @param ctx 
+   * @param ctx
    * @description Upon issue-succeeded or verify-succeeded, use the AQ API to validate the received claims JWT
    */
   private async validateClaimsJwt( ctx: Context ) {
     const options = {
-      url: `${Config.get("demoTouchpoints.api")}/api/touchpoint/${ctx.request.body.touchpoint.id}/validate-claims-jwt`,
+      url: `${Config.get('demoTouchpoints.api')}/api/touchpoint/${ctx.request.body.touchpoint.id}/validate-claims-jwt`,
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json'      
+          'Content-Type': 'application/json'
       },
       data: {jwt: ctx.request.body.claimsJwt}
     };
     try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {data, status, headers} = await axios.request(options);
         if( status != 200 ) {
           console.log( `${ctx.request.method} ${ctx.request.path} - Validate ClaimsJwt FAILED status=${status}`);
@@ -47,8 +47,8 @@ export class WebhookController {
 
   /**
    * @method issueSucceeded
-   * @param ctx 
-   * @description This webhook is invoked by the AQ API when an issuance succeeds. The request body includes the claims JWT 
+   * @param ctx
+   * @description This webhook is invoked by the AQ API when an issuance succeeds. The request body includes the claims JWT
    */
   @Post('/issue-succeeded') // try: https://touchpoint-demo.ngrok.io/api/webhook/issue-succeeded
   async issueSucceeded(ctx: Context) {
@@ -59,8 +59,8 @@ export class WebhookController {
 
   /**
    * @method revokeSucceeded
-   * @param ctx 
-   * @description This webhook is invoked by the AQ API when an issuance succeeds. The request body includes the claims JWT 
+   * @param ctx
+   * @description This webhook is invoked by the AQ API when an issuance succeeds. The request body includes the claims JWT
    */
   @Post('/revoke-succeeded') // try: https://touchpoint-demo.ngrok.io/api/webhook/revoke-succeeded
   async revokeSucceeded(ctx: Context) {
@@ -70,8 +70,8 @@ export class WebhookController {
 
   /**
    * @method verifySucceeded
-   * @param ctx 
-   * @description This webhook is invoked by the AQ API when a verification succeeds. The request body includes the claims JWT 
+   * @param ctx
+   * @description This webhook is invoked by the AQ API when a verification succeeds. The request body includes the claims JWT
    */
   @Post('/verify-succeeded') // try: https://touchpoint-demo.ngrok.io/api/webhook/verify-succeeded
   async verifySucceeded(ctx: Context) {
@@ -80,4 +80,3 @@ export class WebhookController {
     return new HttpResponseOK();
   }
 }
-
