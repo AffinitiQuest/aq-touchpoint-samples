@@ -152,6 +152,7 @@ Kicks off the invocation of a TouchPoint by id AND opens a text/event-stream. Th
   "iss": "Gallaghers.ca",
   "iat": 1680287023,
   "exp": 1680287323,
+  "operation": "issue",
   "claims": {
     "Organization Id": "7",
     "Organization": "Affiniti Quest",
