@@ -171,9 +171,16 @@ Kicks off the invocation of a TouchPoint by id AND opens a text/event-stream. Th
   "iss": "Gallaghers.ca",
   "iat": 1680287248,
   "exp": 1680287548,
+  "operation": "verify",
   "claims": [
     {
-      "credentialDesignId": "709383f54b6e406fb6db9de61745efa7",
+      "authority": "did:web:gallaghers.ca",
+      "expiryDate": "2024-03-18T00:51:38.000Z",
+      "type": [
+        "VerifiableCredential",
+        "709383f54b6e406fb6db9de61745efa7"
+      ],
+      "status": "active"
       "claims": {
         "__credentialId__": "d3d17ca2-af17-47d1-a922-d2a96fc44ba7",
         "Organization Id": "7",
@@ -186,7 +193,13 @@ Kicks off the invocation of a TouchPoint by id AND opens a text/event-stream. Th
       }
     },
     {
-      "credentialDesignId": "ef8366f5e60641ad80fefbcd6a5c49a0",
+      "authority": "did:web:gallaghers.ca",
+      "expiryDate": "2024-03-18T11:51:38.000Z",
+      "type": [
+        "VerifiableCredential",
+        "ef8366f5e60641ad80fefbcd6a5c49a0"
+      ],
+      "status": "active"
       "claims": {
         "__credentialId__": "ca241066-0511-4fbc-81bc-a386340871d8",
         "name": "Warren Gallagher",
