@@ -1,0 +1,17 @@
+{
+  "settings": {
+    "debug": true,
+    "loggerFormat": "foal"
+  },
+  "aq": {
+    "api": {
+      "url": "http://localhost:3002"
+    }
+  },
+  "demoTouchpoints": {
+    "verify": "b5110ffd-7998-4282-a67f-748fa4439458",
+    "issue": "831e3ef7-091e-44e2-b2ee-acfd0ab50973",
+    "revoke": "92341e0c-e826-417f-a8f5-e33882c11a8a",
+    "service-desk": "6f22f6ac-955d-4c7b-223e-08db797c077a"
+  }
+}

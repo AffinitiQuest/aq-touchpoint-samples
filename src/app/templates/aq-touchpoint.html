@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>{{ title }} </title>
-  <link rel="shortcut icon" href="logo.png">
+  <link rel="shortcut icon" href="/logo.png">
   <style>
   </style>
   <script type="module" src="{{ api }}/aq-touchpoint/aq-touchpoint.js" ></script>
@@ -35,7 +35,7 @@
     <tbody>
       <tr>
         <td> 
-          <aq-touchpoint class="tp-light" tp_id="{{ touchpointId }}" logging="true" auth_url="/api/auth" revoke_handle="{{ revocationHandle }}">
+          <aq-touchpoint class="tp-light" tp_id="{{ touchpointId }}" layout="{{ layout }}" logging="true" auth_url="/api/auth/{{ touchpointId }}" revoke_handle="{{ revocationHandle }}">
           </aq-touchpoint>    
           <a id="revoke" hidden>Revoke this credential</a>
         </td>    
@@ -58,7 +58,7 @@
           console.log( `publicKey\n${publicKey}\n` )
         }
         if( e.detail.touchpoint.type == "issue" ) {
-          const href = `/aq-touchpoint-revoke?revocationHandle=${encodeURIComponent(e.detail.revocationHandle)}`;
+          const href = `/aq-touchpoint/revoke?revocationHandle=${encodeURIComponent(e.detail.revocationHandle)}`;
           const revokeElement = document.querySelector('#revoke');
           if( revokeElement ) {
             revokeElement.setAttribute('href', href);

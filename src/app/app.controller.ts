@@ -1,8 +1,11 @@
-import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict, ValidateQueryParam } from '@foal/core';
+import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict, ValidateQueryParam, HttpResponseOK, ValidatePathParam } from '@foal/core';
 
 import { ApiController } from './controllers';
 import { Auth } from './services';
 import axios from 'axios';
+import { createHttpResponseObject } from './utils/httpresponse.util';
+import { z } from 'zod';
+import { generateSchema } from '@anatine/zod-openapi';
 
 @Hook(() => response => {
   // Every response of this controller and its sub-controllers will be added this header.
@@ -15,10 +18,6 @@ export class AppController {
   subControllers = [
     controller('/api', ApiController),
   ];
-
-  private static operationIssue = 'issue';
-  private static operationVerify = 'verify';
-  private static operationRevoke = 'revoke';
 
   @Get('/')
   private async index(ctx: Context) {
@@ -38,44 +37,41 @@ export class AppController {
     return await render(template, {}, __dirname);
   }
 
-  private async handleAqTouchpoint(ctx: Context, operation: string, revocationHandle = '' ) {
+  @Get('/aq-touchpoint/:operation')
+  @ValidatePathParam('operation', generateSchema(z.enum(['issue', 'verify', 'revoke'])))
+  @ValidateQueryParam('revocationHandle', {type: 'string'}, {required: false})
+  @ValidateQueryParam('layout', generateSchema(z.enum(['none', 'minimal', 'compact', 'full']).default('compact')))
+  async aqTouchpoint(ctx: Context, {operation}: {operation: string}) {
     const templateProperties = {
       operation: operation,
-      api: Config.get('demoTouchpoints.api'),
+      api: Config.get('aq.api.url'),
       touchpointId: Config.get(`demoTouchpoints.${operation}`),
-      title: `${operation} - &lt;aq-touchpoint/&gt;`,
-      revocationHandle: revocationHandle
+      layout: ctx.request.query.layout, // ? ctx.request.query.layout : 'compact',
+      title: `${operation} - &lt;aq-touchpoint/&gt;`
     };
+    console.log(`templateProperties=${JSON.stringify(templateProperties,null,2)}`)
+    if( operation === 'revoke' && ctx.request.query.revocationHandle ) {
+      templateProperties['revocationHandle'] = ctx.request.query.revocationHandle
+    }
      return await render('templates/aq-touchpoint.html', templateProperties, __dirname);
   }
 
-  @Get('/aq-touchpoint-issue')
-  async aqTouchpointIssue(ctx: Context) {
-    return this.handleAqTouchpoint(ctx, AppController.operationIssue);
-  }
-
-  @Get('/aq-touchpoint-revoke')
-  @ValidateQueryParam('revocationHandle', {type: 'string'}, {required: true})
-  async aqTouchpointRevoke(ctx: Context) {
-    return this.handleAqTouchpoint(ctx, AppController.operationRevoke, ctx.request.query.revocationHandle);
-  }
-
-  @Get('/aq-touchpoint-verify')
-  async aqTouchpointVerify(ctx: Context) {
-    return this.handleAqTouchpoint(ctx, AppController.operationVerify);
-  }
-
-  private async handleOpenTouchpoint( ctx: Context,  operation: string ) {
-    // we need an auth token to use in our call to the AffinitiQuest API
-    const token = await this.authService.getAccessToken() as string;
+  @Get('/open-touchpoint/:operation/:layout')
+  @ValidatePathParam('operation', generateSchema(z.enum(['issue', 'verify', 'revoke'])))
+  @ValidatePathParam('layout', generateSchema(z.enum(['none', 'minimal', 'compact', 'full'])))
+  async openTouchpoint(ctx: Context, {operation, layout}: {operation: string, layout: string}) {
+    const tenantId = Config.getOrThrow('aq.api.auth.tenantId');
+    const apiKey = Config.getOrThrow('aq.api.auth.apiKey');
+    const authorizationHeaderValue = `Basic ${Buffer.from(`${tenantId}:${apiKey}`, 'utf8').toString('base64')}`;
 
     // prepare to make the API call
     const touchpointId = Config.get(`demoTouchpoints.${operation}`);
     const options = {
-      url: `${Config.get('demoTouchpoints.api')}/api/touchpoint/${touchpointId}/open`,
+      url: `${Config.get('aq.api.url')}/api/touchpoint/${touchpointId}/open?render=html-page&layout=${layout}`,
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`      }
+        'Authorization': authorizationHeaderValue
+      }
     };
     try {
       // make the API call to open the touchpoint
@@ -84,38 +80,20 @@ export class AppController {
       if( status != 200 ) {
         return new HttpResponseBadRequest({status: status, error: data});
       }
-      console.log( data );
-
-      // use the data returned from the API call to render the template html
-      return await render('templates/open-touchpoint.html', {
-        touchpointId: touchpointId,
-        title: `${operation} - Open Touchpoint`,
-        brandLogo: data.brand.logo,
-        touchpointTitle: data.touchpoint.title,
-        qrcode: data.action.qrcode,
-        wallet: 'Microsoft Authenticator'
-      }, __dirname);
+      return new HttpResponseOK(data.render.content).setHeader('Content-Type', data.render.contentType);
     }
-    catch( e ) {
-      console.log('handleOpenTouchpoint Failed');
-    }
-    return new HttpResponseConflict();
-  }
-
-  @Get('/open-touchpoint-issue')
-  async openTouchpointIssue(ctx: Context) {
-    return await this.handleOpenTouchpoint(ctx, AppController.operationIssue);
-  }
-
-  @Get('/open-touchpoint-verify')
-  async openTouchpointVerify(ctx: Context) {
-    return await this.handleOpenTouchpoint(ctx, AppController.operationVerify);
+    catch( error:any ) {
+      if( error.response ) {
+        console.log(`handleOpenTouchpoint Failed ${error.response.status} ${error.message} ${JSON.stringify(error.response.data,null,2)}`);
+        return createHttpResponseObject(error.response.status, error.response.data);
+      }
+     }
   }
 
   @Get('/minimal-demo')
   async minimalDemo(ctx: Context) {
     return await render('templates/minimal-demo.html', {
-      api: Config.get('demoTouchpoints.api'),
+      api: Config.get('aq.api.url'),
       touchpointId: Config.get('demoTouchpoints.verify'),
     }, __dirname);
   }
@@ -123,7 +101,7 @@ export class AppController {
   @Get('/service-desk')
   async serviceDesk(ctx: Context) {
     const templateProperties = {
-      api: Config.get('demoTouchpoints.api'),
+      api: Config.get('aq.api.url'),
       touchpointId: Config.get('demoTouchpoints.service-desk')
     };
      return await render('templates/service-desk.html', templateProperties, __dirname);
@@ -132,7 +110,7 @@ export class AppController {
   @Get('/remote-device')
   async remoteDevice(ctx: Context) {
     const templateProperties = {
-      api: Config.get('demoTouchpoints.api')
+      api: Config.get('aq.api.url')
     };
     return await render('templates/remote-device.html', templateProperties, __dirname);
   }
