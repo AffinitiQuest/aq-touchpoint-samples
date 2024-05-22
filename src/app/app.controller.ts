@@ -78,7 +78,6 @@ export class AppController {
     try {
       // make the API call to open the touchpoint
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      console.log(`openTouchpoint ${JSON.stringify(options,null,2)}`)
       const {data, status, headers} = await axios.request(options);
       if( status != 200 ) {
         return new HttpResponseBadRequest({status: status, error: data});
