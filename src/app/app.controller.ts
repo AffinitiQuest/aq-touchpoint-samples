@@ -56,10 +56,11 @@ export class AppController {
      return await render('templates/aq-touchpoint.html', templateProperties, __dirname);
   }
 
-  @Get('/open-touchpoint/:operation/:layout')
+  @Get('/open-touchpoint/:operation/:format/:layout')
   @ValidatePathParam('operation', generateSchema(z.enum(['issue', 'verify', 'revoke'])))
+  @ValidatePathParam('format', generateSchema(z.enum(['none', 'html-tag', 'html-page'])))
   @ValidatePathParam('layout', generateSchema(z.enum(['none', 'minimal', 'compact', 'full'])))
-  async openTouchpoint(ctx: Context, {operation, layout}: {operation: string, layout: string}) {
+  async openTouchpoint(ctx: Context, {operation, format, layout}: {operation: string, format: string, layout: string}) {
     const tenantId = Config.getOrThrow('aq.api.auth.tenantId');
     const apiKey = Config.getOrThrow('aq.api.auth.apiKey');
     const authorizationHeaderValue = `Basic ${Buffer.from(`${tenantId}:${apiKey}`, 'utf8').toString('base64')}`;
@@ -67,24 +68,31 @@ export class AppController {
     // prepare to make the API call
     const touchpointId = Config.get(`demoTouchpoints.${operation}`);
     const options = {
-      url: `${Config.get('aq.api.url')}/api/touchpoint/${touchpointId}/open?render=html-page&layout=${layout}`,
+      url: `${Config.get('aq.api.url')}/api/touchpoint/${touchpointId}/open?format=${format}&layout=${layout}`,
       method: 'GET',
       headers: {
         'Authorization': authorizationHeaderValue
       }
     };
+
     try {
       // make the API call to open the touchpoint
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      console.log(`openTouchpoint ${JSON.stringify(options,null,2)}`)
       const {data, status, headers} = await axios.request(options);
       if( status != 200 ) {
         return new HttpResponseBadRequest({status: status, error: data});
       }
-      return new HttpResponseOK(data.render.content).setHeader('Content-Type', data.render.contentType);
+      if( format === 'none' ) {
+        return new HttpResponseOK(`<pre>${JSON.stringify(data,null,2)}</pre>`).setHeader('Content-Type', 'text/html');
+      }
+      else {
+        return new HttpResponseOK(data.render.content).setHeader('Content-Type', data.render.contentType);
+      }
     }
     catch( error:any ) {
       if( error.response ) {
-        console.log(`handleOpenTouchpoint Failed ${error.response.status} ${error.message} ${JSON.stringify(error.response.data,null,2)}`);
+        console.log(`openTouchpoint Failed ${error.response.status} ${error.message} ${JSON.stringify(error.response.data,null,2)}`);
         return createHttpResponseObject(error.response.status, error.response.data);
       }
      }
