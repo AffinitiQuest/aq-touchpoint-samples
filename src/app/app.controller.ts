@@ -117,7 +117,8 @@ export class AppController {
   @Get('/remote-device')
   async remoteDevice(ctx: Context) {
     const templateProperties = {
-      api: Config.get('aq.api.url')
+      api: Config.get('aq.api.url'),
+      touchpointId: Config.get('demoTouchpoints.remote-device')
     };
     return await render('templates/remote-device.html', templateProperties, __dirname);
   }
