@@ -40,13 +40,11 @@ export class AppController {
   @Get('/aq-touchpoint/:operation')
   @ValidatePathParam('operation', generateSchema(z.enum(['issue', 'verify', 'revoke'])))
   @ValidateQueryParam('revocationHandle', {type: 'string'}, {required: false})
-  @ValidateQueryParam('layout', generateSchema(z.enum(['none', 'minimal', 'compact', 'full']).default('compact')))
   async aqTouchpoint(ctx: Context, {operation}: {operation: string}) {
     const templateProperties = {
       operation: operation,
       api: Config.get('aq.api.url'),
       touchpointId: Config.get(`demoTouchpoints.${operation}`),
-      layout: ctx.request.query.layout, // ? ctx.request.query.layout : 'compact',
       title: `${operation} - &lt;aq-touchpoint/&gt;`
     };
     console.log(`templateProperties=${JSON.stringify(templateProperties,null,2)}`)
@@ -56,19 +54,23 @@ export class AppController {
      return await render('templates/aq-touchpoint.html', templateProperties, __dirname);
   }
 
-  @Get('/open-touchpoint/:operation/:format/:layout')
+  @Get('/open-touchpoint/:operation/:format')
   @ValidatePathParam('operation', generateSchema(z.enum(['issue', 'verify', 'revoke'])))
   @ValidatePathParam('format', generateSchema(z.enum(['none', 'html-tag', 'html-page'])))
-  @ValidatePathParam('layout', generateSchema(z.enum(['none', 'minimal', 'compact', 'full'])))
-  async openTouchpoint(ctx: Context, {operation, format, layout}: {operation: string, format: string, layout: string}) {
+  @ValidateQueryParam('layout', generateSchema(z.enum(['none', 'minimal', 'compact', 'full']).default('compact')))
+  async openTouchpoint(ctx: Context, {operation, format}: {operation: string, format: string}) {
     const tenantId = Config.getOrThrow('aq.api.auth.tenantId');
     const apiKey = Config.getOrThrow('aq.api.auth.apiKey');
     const authorizationHeaderValue = `Basic ${Buffer.from(`${tenantId}:${apiKey}`, 'utf8').toString('base64')}`;
 
     // prepare to make the API call
     const touchpointId = Config.get(`demoTouchpoints.${operation}`);
+    let url = `${Config.get('aq.api.url')}/api/touchpoint/${touchpointId}/open?format=${format}`;
+    if( ctx.request.query.layout ) {
+      url += `&layout=${ctx.request.query.layout}`;
+    }
     const options = {
-      url: `${Config.get('aq.api.url')}/api/touchpoint/${touchpointId}/open?format=${format}&layout=${layout}`,
+      url: url,
       method: 'GET',
       headers: {
         'Authorization': authorizationHeaderValue
