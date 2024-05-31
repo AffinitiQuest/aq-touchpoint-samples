@@ -1,21 +1,21 @@
-import { Config, HttpResponse, HttpResponseBadRequest, HttpResponseUnauthorized } from '@foal/core';
+import { Config, HttpResponse, HttpResponseUnauthorized } from '@foal/core';
 import axios from 'axios';
+import { createHttpResponseObject } from '../utils/httpresponse.util';
 
 export class Auth {
 
-    async getAccessToken() : Promise<string | HttpResponse> {
+    async getAccessToken(touchpointId: string) : Promise<string | HttpResponse> {
         // Azure tenant settings
-        const tenantId = Config.get('auth.tenantId');
-        const clientId = Config.get('auth.clientId');
-        const clientSecret= Config.get('auth.clientSecret');
-
+        const tenantId = Config.getOrThrow('aq.api.auth.tenantId');
+        const apiKey = Config.getOrThrow('aq.api.auth.apiKey');
+        const authorizationHeaderValue = `Basic ${Buffer.from(`${tenantId}:${apiKey}`, 'utf8').toString('base64')}`;
+    
         const options = {
-            url: `${Config.get('demoTouchpoints.api')}/api/authenticate`,
-            method: 'POST',
+            url: `${Config.get('aq.api.url')}/api/touchpoint/${touchpointId}/access-token`,
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
-            },
-            data: {tenantId: tenantId, clientId: clientId, clientSecret: clientSecret}
+                'Authorization': authorizationHeaderValue
+            }
         };
         try {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,10 +23,10 @@ export class Auth {
             if( status != 200 ) {
                 return new HttpResponseUnauthorized();
             }
-            return data.accessToken;
+            return data;
         }
-        catch( e ) {
-            return new HttpResponseBadRequest(e);
+        catch( error:any ) {
+            return createHttpResponseObject(error.response.status, error.response.data);
         }
     }
 }

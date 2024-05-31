@@ -23,7 +23,7 @@ export class WebhookController {
    */
   private async validateClaimsJwt( ctx: Context ) {
     const options = {
-      url: `${Config.get('demoTouchpoints.api')}/api/touchpoint/${ctx.request.body.touchpoint.id}/validate-claims-jwt`,
+      url: `${Config.get('aq.api.url')}/api/touchpoint/${ctx.request.body.touchpoint.id}/validate-claims-jwt`,
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
