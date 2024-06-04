@@ -57,9 +57,9 @@ thus acting as a remote control. Note that the connections between the component
 
 ## ```<aq-remotedevice/>```
 
-### ```<aq-remotedevice/>``` Registration
+### ```<aq-remotedevice/>``` Configuration
 
-When ```<aq-remotedevice/>``` runs on a page, it checks browser local storage to determine it's identity. If no identity is found, then a user interface form is presented allowing the device to be registered with the AffinitiQuest platform as a new kind of touchpoint. Upon successful registration the component saves it's identity to local storage and switches the user interface to display it's idle state. In the idle state, the device is awaiting a command to be issued to it by an ```<aq-servicedesk/>```. A part of registration requires selection of an AffinitiQuest brand that has been previously defined in the AffinitiQuest administration portal. This new device is associated with that brand. After registration, the device will be visible in the administration portal as a new touchpoint of type RemoteDevice.
+Before using the ```<aq-remotedevice/>``` component on a page, a new RemoteDevice touchpoint must be configured using the AffinitiQuest administration web portal. This configuration process requires selection of an authority that the service desk configuration will be associated with.
 
 ### ```<aq-remotedevice/>``` Remote Control
 
@@ -71,7 +71,7 @@ The ```<aq-remotedevice/>``` also can receive a reset command that aborts any co
 
 ### ```<aq-servicedesk/>``` Configuration
 
-Before using the ```<aq-servicedesk/>``` component on a page, a new ServiceDesk touchpoint must be configured using the AffinitiQuest administration web portal. This configuration process requires selection of a brand that the service desk configuration will be associated with.
+Before using the ```<aq-servicedesk/>``` component on a page, a new ServiceDesk touchpoint must be configured using the AffinitiQuest administration web portal. This configuration process requires selection of an authority that the service desk configuration will be associated with.
 
 ![Service Desk Configuration Screen Shot](images/ServiceDeskConfiguration.png)
 
@@ -118,6 +118,7 @@ The following are attributes that can be provided to the component:
 
 |Attribute Name| Description |
 |--|--|
+| tp_id | required touchpoint identifier |
 | auth_url | required unless auth_jwt is provided |
 | auth_method | optional - specifies the HTTP method to use with auth_url, defaults to GET |
 | auth_jwt | required unless auth_url is provided |
@@ -131,8 +132,6 @@ The following are events that are dispatched by the component. You can receive t
 
 |Event Name| Description |
 |--|--|
-| 'unregistered' | event handler fired when the component has not yet been registered |
-| 'registered' | event handler fired when the component has successfully registered |
 | 'idle' | event handler fired when the component has registered and is idle - awaiting a run request |
 | 'running' | event handler fired when the component has embedded a touchpoint as a result of receiving a run request |
 | 'triggered' | event handler fired when a running embedded touchpoint has been scanned by a wallet |
@@ -164,6 +163,7 @@ The following are attributes that can be provided to the component:
 
 |Attribute Name| Description |
 |--|--|
+| tp_id | required touchpoint identifier |
 | auth_url | required unless auth_jwt is provided |
 | auth_method | optional - specifies the HTTP method to use with auth_url, defaults to GET |
 | auth_jwt | required unless auth_url is provided |

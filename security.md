@@ -41,14 +41,14 @@ Each of the touchpoint HTML Custom elements takes an attribute named ```auth_url
 
 An example might be:
 ```html
-<aq-touchpoint tp_id="some-touchpoint-id" auth_url="/api/auth"/>
+<aq-touchpoint tp_id="some-touchpoint-id" auth_url="/api/auth/:touchpointId"/>
 ```
 
 Assume that the page with this markup is loaded from:
    ```https://my.3rd-party-app.com``` and thus provides a URL endpoint at:
-   ```https://my.3rd-party-app.com/api/auth```
+   ```https://my.3rd-party-app.com/api/auth/:touchpointId```
 
-The endpoint should generate an AffinitiQuest access token and return this JWT as the body of the response to the endpoint request.
+The endpoint should generate an AffinitiQuest touchpoint access token and return this JWT as the body of the response to the endpoint request.
 
 The endpoint should be secured by your application. You do not want anybody to gain an access token that will allow arbitrary issuance, verification or revocation of credentials.
 
@@ -69,22 +69,12 @@ Generation of this access token should be done by your server, not your client a
 
 This method is approriate if your application uses an authentication method other than session cookies.
 
-Token expiry is handled by your application through use of a javascript event handler.
-Example code:
-```javascript
-const touchpointElement = document.querySelector('aq-touchpoint');
-if( touchpointElement ) {
-    touchpointElement.addEventListener('unauthorized', function(event) {
-        // use whatevent means to get a new JWT access token. In this case assume session cookies are being used.
-        const response = await fetch('/api/auth');
-        if(response.ok) {
-            const accessToken = await response.text();
-            // update the 'auth_jwt' attribute of the element to use the new access token
-            event.currentTarget.setAttribute('auth_jwt', accessToken );
-        }
-    });
-}
-```
+There should be no need to handle token expiry as touchpoint access tokens have a lifetime equal to the TimeToLive for the touchpoint.
+
+AffintiQuest provides an API for generating a touchpoint access token by doing a ```'GET'``` to ```https://api.affinitiquest.io/api/touchpoint/:touchpointId/auth```. This endpoint is secured using HTTP Basic authentication where you will provide your AffinitiQuest tenantId and an AffiniQuest
+API key as the userid:password respectively.
+
+The issued token is bound to a particular touchoint based on its touchpointId.
 
 ## Touchpoint - ```app_context``` attribute
 
