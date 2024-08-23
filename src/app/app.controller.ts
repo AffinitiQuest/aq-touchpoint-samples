@@ -1,4 +1,4 @@
-import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, HttpResponseConflict, ValidateQueryParam, HttpResponseOK, ValidatePathParam } from '@foal/core';
+import { Hook, Context, controller, Get, dependency, render, Config, HttpResponseBadRequest, ValidateQueryParam, HttpResponseOK, ValidatePathParam } from '@foal/core';
 
 import { ApiController } from './controllers';
 import { Auth } from './services';
