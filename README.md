@@ -149,8 +149,7 @@ TouchpointDescriptor Response Body
     "logo": "data:image/png,%89PNG%0D%0A..."
   },
   "action": {
-    "url": "https://some-server/path",
-    "qrCode": "data:image/png,%89PNG%0D%0A..." // QrCode representing the actionUrl
+    "url": "https://some-server/path" // This URL could be encoded into a QrCode for a wallet to scan
   },
   "render": {
     "contentType":   "<none|text/html>",
