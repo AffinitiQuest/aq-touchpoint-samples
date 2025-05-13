@@ -471,13 +471,14 @@ When a touchpoint success event is being generated the RSA private key associate
     aq-touchpoint ->> AQ-API: connect websocket to https://api.affinitiquest.io and emit '/touchpoint/open' event
     AQ-API ->> aq-touchpoint: emit '/touchpoint/config'
     User-Wallet ->> AQ-API : Scan QR Code POST https://api.affinitiquest.io/api/interactions/{id}/offer
+    AQ-API ->> User-Wallet : Credential Offer
     AQ-API ->> aq-touchpoint: emit event '/touchpoint/triggered'
     aq-touchpoint ->> User-Browser: Invoke registered event=triggered handler
+    User-Wallet ->> AQ-API : Credential Accepted
     Note over AQ-API,Website: Ask Website to provide claims attributes for credential
     AQ-API ->> Website: GET /api/aqio/issue-attributes?app_context="something"
     Website ->> AQ-API: 200 OK {"claims":{"attr1": "value", "attr2": "value"}}
-    AQ-API ->> User-Wallet : Credential Offer
-    User-Wallet ->> AQ-API : Credential Accepted
+    AQ-API ->> User-Wallet: Signed Credential
     Note over AQ-API,Website: issue-success-webhook event includes claims JWT
     AQ-API ->> Website: POST /api/aqio/issue-success-webhook
     Website ->> AQ-API: 200 OK
