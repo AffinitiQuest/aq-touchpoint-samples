@@ -476,6 +476,7 @@ When a touchpoint success event is being generated the RSA private key associate
     Note over AQ-API,Website: Ask Website to provide claims attributes for credential
     AQ-API ->> Website: GET /api/aqio/issue-attributes?app_context="something"
     Website ->> AQ-API: 200 OK {"claims":{"attr1": "value", "attr2": "value"}}
+    AQ-API ->> User-Wallet : Credential Offer
     User-Wallet ->> AQ-API : Credential Accepted
     Note over AQ-API,Website: issue-success-webhook event includes claims JWT
     AQ-API ->> Website: POST /api/aqio/issue-success-webhook
